@@ -94,7 +94,7 @@ CREATE TABLE user(
 	address VARCHAR(30) NOT NULL UNIQUE COMMENT '用户住址'
 )CHARACTER SET utf8 COMMENT '用户表';
 
-INSERT INTO user(id,name,age,gender,birthday,address) VALUES(null,'小明',5,1,'2012-12-12','南京东路108号');
+INSERT INTO user(id,name,age,gender,birthday,address) VALUES(NULL,'小明',5,1,'2012-12-12','南京东路108号');
 
 SHOW VARIABLES LIKE 'characte	r%';
 /*设置CMD Client 的字符集*/
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `category`(
 /*添加新的字段为分类描述varchar(20)*/
 ALTER TABLE category ADD `desc` VARCHAR(20) COMMENT '分类描述';
 
-/*为分类表的描述字段进行修改,类型varchar(50) 添加约束 not null */
+/*为分类表的描述字段进行修改,类型varchar(50) 添加约束 not NULL */
 ALTER TABLE category MODIFY `desc` VARCHAR(50) NOT NULL COMMENT '分类描述';
 
 /*为分类表的分类名称字段进行更换,更换为description varchar(30)*/
@@ -136,7 +136,7 @@ RENAME TABLE category TO category2;
 /*为分类表category2的编码表进行修改,修改成gbk*/
 ALTER TABLE category CHARACTER  SET gbk;
 
-/*使用insert命令完成表*/
+/*使用INSERT命令完成表*/
 INSERT INTO category VALUES(NULL,'手机'),(NULL,'电脑');
 
 /*使用delete命令删除category一条记录*/
@@ -223,15 +223,15 @@ CREATE TABLE IF NOT EXISTS users(
 INSERT INTO users VALUES(NULL,18,'李逍遥','1666-06-06',9999.999);
 INSERT INTO users VALUES(NULL,17,'赵灵儿','1665-05-05',99999.9999);
 INSERT INTO users VALUES(NULL,18,'林月如','1666-08-08',55555.555);
-INSERT INTO users VALUES(NULL,50,'石公虎','1610-10-10',NUll);
+INSERT INTO users VALUES(NULL,50,'石公虎','1610-10-10',NULL);
 
 /*3:查询所有员工的薪资,年薪,以及姓名*/
-SELECT ifnull(salary,0) AS '薪资',ifnull(salary,0)*12 AS '年薪', name AS '姓名' FROM users;
+SELECT ifNULL(salary,0) AS '薪资',ifNULL(salary,0)*12 AS '年薪', name AS '姓名' FROM users;
 
 /*4:查询所有员工,如果薪资没有的员工,salary列值显示:没有薪资,倒序显示.*/
-SELECT ifnull(salary,'没有薪资') AS '薪资',name AS '姓名' FROM users ORDER BY salary DESC;
+SELECT ifNULL(salary,'没有薪资') AS '薪资',name AS '姓名' FROM users ORDER BY salary DESC;
 
-/*5:将salary列为null的用户薪资,修改为0.00.*/
+/*5:将salary列为NULL的用户薪资,修改为0.00.*/
 UPDATE users SET salary = 0 WHERE salary IS NULL;
 
 /*基于用户表users完成相关查询.*/
@@ -248,3 +248,348 @@ SELECT * FROM users WHERE birthday < '1990-1-1';
 SELECT * FROM users WHERE salary < 1200 OR salary > 5000;
 /*4:查询姓名以明结尾的员工信息.*/
 SELECT * FROM users WHERE name LIKE '%明';
+
+
+
+
+
+
+--  Day02
+CREATE TABLE exam(
+	id INT NOT NULL AUTO_INCREMENT COMMENT '学生ID',
+	name VARCHAR(20) NOT NULL COMMENT '学生姓名',
+	chinese DOUBLE COMMENT '语文',
+	math DOUBLE COMMENT '数学',
+	english DOUBLE COMMENT '英文',
+	PRIMARY KEY(id)
+)CHARACTER SET utf8 COMMENT '考试表';
+
+INSERT INTO exam VALUES(NULL, '关羽', 85, 76, 60);
+INSERT INTO exam VALUES(NULL, '张飞', 70, 75, 70);
+INSERT INTO exam VALUES(NULL, '赵云', 90, 65, 95);
+INSERT INTO exam VALUES(NULL, '刘备', 97, 50, 50);
+INSERT INTO exam VALUES(NULL, '曹操', 90, 89, 80);
+INSERT INTO exam VALUES(NULL, '司马懿', 90, 67, 65);
+
+-- 查询表中所有学生的信息
+SELECT * FROM exam;
+
+-- 查询表中所有学生的姓名和对应的英语成绩
+SELECT name, english FROM exam;
+
+-- 查询姓名为赵云的学生成绩
+SELECT * FROM exam WHERE name = '赵云';
+SELECT name, english FROM exam WHERE name = '赵云';
+
+-- 查询英语成绩大于90分的同学
+SELECT * FROM exam WHERE english > 90;
+
+-- 查询英语分数不等于70分的所有同学
+SELECT * FROM exam WHERE english <> 70;
+SELECT * FROM exam WHERE NOT english = 70;
+SELECT * FROM exam WHERE english != 70;
+SELECT * FROM exam WHERE NOT english IN(70);
+
+-- 查询英语分数在80-90之间的同学(包含80-90)
+SELECT * FROM exam WHERE english >= 80 AND english <= 90;
+SELECT * FROM exam WHERE english BETWEEN 80 AND 90;
+
+-- 查询数学分类为89,75,91的同学
+SELECT * FROM exam WHERE math = 89 OR math = 75 OR math = 91;
+SELECT * FROM exam WHERE math IN (89, 75, 91);
+
+INSERT INTO exam VALUES(NULL, '刘阿斗', 86, NULL, 83);
+
+-- 查询所有姓刘的学生的成绩
+SELECT * FROM exam WHERE name LIKE '刘%';
+
+-- 查询所有姓刘两个字的学生成绩
+SELECT * FROM exam WHERE name LIKE '刘_';
+
+-- 查询数学成绩不为NULL的学生
+SELECT * FROM exam WHERE math IS NOT NULL;
+
+-- 查询数学成绩为NULL的学生
+SELECT * FROM exam WHERE math IS NULL;
+
+-- 查询数学分>80并且语文分>80的同学
+SELECT * FROM exam WHERE math > 80 AND chinese > 80;
+
+-- 查询数学分>80 或者 语文分>80的同学
+SELECT * FROM exam WHERE math > 80 OR  chinese > 80;
+SELECT * FROM exam WHERE chinese > 80 OR math > 80;
+
+-- 查询英语分数不大于60的学生
+SELECT * FROM exam WHERE  NOT english > 60;
+SELECT * FROM exam WHERE  english <= 60;
+
+-- 过滤掉重复的语文成绩
+SELECT chinese FROM exam;
+SELECT DISTINCT chinese FROM exam;
+
+SELECT name AS 姓名, chinese AS 语文, math AS 数学, english AS 英语 FROM exam;
+SELECT name AS '姓名', chinese AS '语文', math AS '数学', english AS '英语' FROM exam;
+SELECT name 姓名, chinese 语文, math 数学, english 英语 FROM exam;
+
+-- 查询在所有学生的分数，在显示的时候每门课加10分特长分。（每一门课程都加10分）
+SELECT name , chinese+10 AS 语文, math+10 AS 数学, english+10 AS 英语 FROM exam;
+
+-- 查询每个学生的总分。
+SELECT name AS 姓名, IFNULL(chinese,0)+IFNULL(math,0)+IFNULL(english,0) AS 总分 FROM exam;
+
+-- 对语文成绩升序排序后输出。
+SELECT * FROM exam ORDER BY chinese ASC;
+
+-- 对语文升序排序，如果语文成绩一样，按数学成绩降序排序。
+SELECT * FROM exam ORDER BY chinese ASC, math DESC;
+
+-- 对总分排序按从高到低降序输出
+SELECT * , chinese+math+english AS 总分 FROM exam ORDER BY 总分 DESC;
+SELECT * , chinese+math+english AS 总分 FROM exam ORDER BY chinese+math+english DESC;
+
+-- 显示所有学生的姓名和总成绩；
+SELECT name AS 姓名, chinese+math+english AS 总分 FROM exam;
+
+-- 查询显示学生姓名和总成绩。
+SELECT name AS 姓名, IFNULL(chinese,0)+IFNULL(math,0)+IFNULL(english,0) AS 总分 FROM exam;
+
+-- 对姓刘的学生成绩总分进行降序排序
+SELECT *, IFNULL(chinese,0)+IFNULL(math,0)+IFNULL(english,0) AS 总分 FROM exam 
+	WHERE name LIKE '刘%' ORDER BY 总分 DESC;
+
+-- 统计一个班级共有多少学生？
+SELECT COUNT(*) AS 人数 FROM exam;
+
+-- 统计语文成绩大于等于90的学生有多少个
+SELECT COUNT(*) AS 人数 FROM exam  WHERE chinese >= 90;
+
+-- 统计总分大于250的人数有多少？
+SELECT COUNT(*) AS 人数 FROM exam WHERE IFNULL(chinese, 0)+IFNULL(math,0)+IFNULL(english,0) > 250;
+
+-- 统计一个班级数学总成绩？
+SELECT SUM(math) FROM exam;
+
+-- 分别显示一个班级语文、英语、数学各科的总成绩
+SELECT SUM(chinese) AS 语文, SUM(math) AS 数学, SUM(english) AS 英语 FROM exam;
+
+-- 统计一个班级语文、英语、数学的成绩总和。
+SELECT SUM(chinese)+SUM(math)+SUM(english) AS 总分 FROM exam;
+SELECT SUM(IFNULL(chinese,0)+IFNULL(math,0)+IFNULL(english,0)) AS 总分 FROM exam;
+
+
+-- 统计一个班级语文成绩平均分
+SELECT SUM(chinese) / COUNT(*) FROM exam;
+SELECT ROUND(SUM(chinese)/COUNT(*), 2) FROM exam;
+
+-- 求一个班级数学平均分
+SELECT ROUND(AVG(IFNULL(math,0)),2) AS 数学平均分 FROM exam;
+
+-- 求一个班级总分平均分
+SELECT AVG(IFNULL(chinese,0)+IFNULL(math,0)+IFNULL(english,0)) AS 总分平均分 FROM exam;
+
+-- 统计英语的最高分和最低分
+SELECT MAX(english) AS 英语最高分, MIN(english) AS 英语最低分 FROM exam;
+
+-- 统计总分的最高分和最低分
+SELECT MAX(IFNULL(chinese,0)+IFNULL(math,0)+IFNULL(english,0)) AS 总分最高分,
+	MIN(IFNULL(chinese,0)+IFNULL(math,0)+IFNULL(english,0)) AS 总分最低分 FROM exam;
+
+CREATE TABLE orders(
+	id INT COMMENT '订单ID',
+	product VARCHAR(20) COMMENT '产品名',
+	price DECIMAL COMMENT '价格'
+)CHARACTER SET utf8 COMMENT '订单表';
+
+INSERT INTO orders(id, product, price) VALUES(1, '纸巾', 16);
+INSERT INTO orders(id, product, price) VALUES(2, '纸巾', 16);
+INSERT INTO orders(id, product, price) VALUES(3, '红牛', 5);
+INSERT INTO orders(id, product, price) VALUES(4, '洗衣粉', 60);
+INSERT INTO orders(id, product, price) VALUES(5, '苹果', 8);
+INSERT INTO orders(id, product, price) VALUES(6, '洗衣粉', 60);
+
+-- 查询购买的每种商品的总价。
+SELECT product, SUM(price) FROM orders GROUP BY product;
+
+-- 查询每一种商品的总价大于30的商品，并显示总价。
+SELECT product,SUM(price) AS 总价 FROM orders  GROUP BY product HAVING SUM(price) > 30;
+
+CREATE TABLE IF NOT EXISTS dept(
+	id INT  auto_increment COMMENT '部门id',
+	name VARCHAR(20) COMMENT '部门名称',
+	PRIMARY KEY(id)
+) CHARACTER SET utf8 COMMENT '部门表';
+
+CREATE TABLE IF NOT EXISTS employee(
+	id INT AUTO_INCREMENT COMMENT '员工id',
+	name VARCHAR(20) COMMENT '员工姓名',
+	age TINYINT COMMENT '员工年龄' ,
+	salary DECIMAL COMMENT '员工薪资',
+	dept_id INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (dept_id) REFERENCES dept(id)
+) CHARACTER SET utf8 COMMENT '员工表';
+
+
+/*给部门表添加数据*/
+INSERT INTO dept VALUES(NULL,'人事部');
+INSERT INTO dept VALUES(NULL,'财务部');
+INSERT INTO dept VALUES(NULL,'公关部');
+INSERT INTO dept VALUES(NULL,'总经理办公室');
+
+
+/*给雇员表添加数据*/
+INSERT INTO employee VALUES(NULL,'小乔',18,10000);
+INSERT INTO employee VALUES(NULL,'大乔',19,10000);
+INSERT INTO employee VALUES(NULL,'曹操',20,12000);
+INSERT INTO employee VALUES(NULL,'周瑜',21,13000);
+INSERT INTO employee VALUES(NULL,'刘备',22,14000);
+
+
+
+/*1.	基于products表的数据,进行聚合函数查询.*/
+/*2.	商品汇总,总价等查询。*/
+#1 查询商品的总条数
+SELECT COUNT(*) AS 总条数 FROM product;
+
+#2 查询价格大于200商品的总条数
+SELECT COUNT(*) AS 总条数 FROM product WHERE price > 200;
+
+#3 查询分类为'c001'的所有商品的总和
+SELECT category_id, SUM(price) AS 总和 FROM product 
+	WHERE category_id = 'c001'
+	GROUP BY category_id;
+
+#4 查询分类为'c002'所有商品的平均价格
+SELECT category_id, AVG(IFNULL(price,0)) AS 平均价格 FROM product 
+	WHERE category_id = 'c002'
+		GROUP BY category_id;
+
+#5 查询商品的最大价格和最小价格
+SELECT MAX(price) AS 最大价格, MIN(price) AS 最小价格 FROM product;
+
+#1 统计各个分类商品的个数
+SELECT category_id, COUNT(*) AS 个数  FROM product GROUP BY category_id; 
+
+#2 统计各个分类商品的个数,且只显示个数大于1的信息
+SELECT category_id, COUNT(*) AS 个数 FROM product GROUP BY category_id HAVING 个数 > 1;
+
+/*
+1:设计员工表emp和部门表dept
+  要求: emp表的基本字段 empno int 主键 自动自增长,ename 字符类型 salary 数值类型  bonus 奖金数值型……deptno int 员工在的部门 (外键)
+       dept表的基本字段 deptno int 主键 自动增长 , dname 部门名称 字符类型  dlocation 地理位置 字符类型
+2: 设计表结构 在emp表中设计deptno外键.录入相关数据.
+*/
+
+CREATE TABLE tmp_emp (
+	empno INT UNSIGNED AUTO_INCREMENT COMMENT '员工id',
+	ename VARCHAR(30) NOT NULL DEFAULT '' COMMENT '员工姓名',
+	salary DECIMAL NOT NULL DEFUALT 0 COMMENT '员工薪资',
+	bonus DECIMAL NOT NULL DEFAULT 0 COMMENT '员工奖金',
+	deptno INT NOT NULL COMMNET '部门id',
+	PRIMARY KEY (empno),
+	FOREIGN KEY (deptno) REFERENCES tmp_dept(deptno)
+)CHARACTER SET utf8 COMMENT '员工表';
+
+CREATE TABLE tmp_dept (
+	deptno INT AUTO_INCREMENT COMMENT '部门id',
+	dname VARCHAR(20) NOT NULL DEFAULT '' COMMENT '部门名称',
+	dlocation VARCHAR(20) NOT NULL DEFAULT '' COMMENT '地址位置',
+	PRIMARY KEY (deptno)
+) CHARACTER SET utf8 COMMENT '部门表';
+
+/*
+1:完成学员student 和 老师 teacher 表和课程表的设计
+2:多对多设计原则,引入中间表.
+*/
+
+CREATE TABLE student(
+	id INT UNSIGNED  AUTO_INCREMENT COMMENT '学生学号',
+	name VARCHAR(20) NOT NULL DEFAULT '' COMMENT '学生姓名',
+	city VARCHAR(20) NOT NULL DEFAULT '' COMMENT '学生所在城市',
+	age TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '学生年龄',
+	PRIMARY KEY (id)
+)CHARACTER SET utf8 COMMENT '学生表';
+
+
+CREATE TABLE teacher(
+	id INT UNSIGNED AUTO_INCREMENT COMMENT '老师职工号',
+	name VARCHAR(20) NOT NULL DEFAULT '' COMMENT '老师姓名',
+	PRIMARY KEY (id)
+)CHARACTER SET utf8 COMMENT '老师表';
+
+CREATE TABLE course (
+	id INT UNSIGNED AUTO_INCREMENT COMMENT '课程id',
+	name VARCHAR(20) NOT NULL DEFAULT '' COMMENT '课程名',
+	teacher_id INT UNSIGNED  COMMENT '老师职工号',
+	PRIMARY KEY (id),
+	FOREIGN KEY (teacher_id) REFERENCES teacher(id)
+)CHARACTER SET utf8 COMMENT '课程表';
+
+CREATE TABLE student_course (
+	student_id INT UNSIGNED COMMENT '学生学号',
+	course_id INT UNSIGNED COMMENT '老师职工号',
+	score INT,
+	FOREIGN KEY (student_id) REFERENCES student(id),
+	FOREIGN KEY (course_id) REFERENCES course(id)
+)CHARACTER SET utf8 COMMENT '学生课程表';
+
+INSERT INTO teacher VALUES(NULL,'关羽');
+INSERT INTO teacher VALUES(NULL,'张飞');
+INSERT INTO teacher VALUES(NULL,'赵云');
+
+INSERT INTO student VALUES(NULL,'小王','北京',20);
+INSERT INTO student VALUES(NULL,'小李','上海',18);
+INSERT INTO student VALUES(NULL,'小周','北京',22);
+INSERT INTO student VALUES(NULL,'小刘','北京',21);
+INSERT INTO student VALUES(NULL,'小张','上海',22);
+INSERT INTO student VALUES(NULL,'小赵','北京',17);
+INSERT INTO student VALUES(NULL,'小蒋','上海',23);
+INSERT INTO student VALUES(NULL,'小韩','北京',25);
+INSERT INTO student VALUES(NULL,'小魏','上海',25);
+INSERT INTO student VALUES(NULL,'小明','北京',20);
+
+INSERT INTO course VALUES(NULL,'语文',1);
+INSERT INTO course VALUES(NULL,'数学',1);
+INSERT INTO course VALUES(NULL,'生物',2);
+INSERT INTO course VALUES(NULL,'化学',2);
+INSERT INTO course VALUES(NULL,'物理',2);
+INSERT INTO course VALUES(NULL,'英语',3);
+
+INSERT INTO student_course VALUES(1,1,80);
+INSERT INTO student_course VALUES(1,2,90);
+INSERT INTO student_course VALUES(1,3,85);
+INSERT INTO student_course VALUES(1,4,78);
+INSERT INTO student_course VALUES(2,2,53);
+INSERT INTO student_course VALUES(2,3,77);
+INSERT INTO student_course VALUES(2,5,80);
+INSERT INTO student_course VALUES(3,1,71);
+INSERT INTO student_course VALUES(3,2,70);
+INSERT INTO student_course VALUES(3,4,80);
+INSERT INTO student_course VALUES(3,5,65);
+INSERT INTO student_course VALUES(3,6,75);
+INSERT INTO student_course VALUES(4,2,90);
+INSERT INTO student_course VALUES(4,3,80);
+INSERT INTO student_course VALUES(4,4,70);
+INSERT INTO student_course VALUES(4,6,95);
+INSERT INTO student_course VALUES(5,1,60);
+INSERT INTO student_course VALUES(5,2,70);
+INSERT INTO student_course VALUES(5,5,80);
+INSERT INTO student_course VALUES(5,6,69);
+INSERT INTO student_course VALUES(6,1,76);
+INSERT INTO student_course VALUES(6,2,88);
+INSERT INTO student_course VALUES(6,3,87);
+INSERT INTO student_course VALUES(7,4,80);
+INSERT INTO student_course VALUES(8,2,71);
+INSERT INTO student_course VALUES(8,3,58);
+INSERT INTO student_course VALUES(8,5,68);
+INSERT INTO student_course VALUES(9,2,88);
+INSERT INTO student_course VALUES(10,1,77);
+INSERT INTO student_course VALUES(10,2,76);
+INSERT INTO student_course VALUES(10,3,80);
+INSERT INTO student_course VALUES(10,4,85);
+INSERT INTO student_course VALUES(10,5,83);
+
+--  1、查询平均成绩大于70分的同学的学号和平均成绩
+SELECT student_id, AVG(score) AS 平均分 FROM student_course GROUP BY student_id HAVING 平均分 > 70; 
+
+-- 查询所有同学的学号、姓名、选课数、总成绩
