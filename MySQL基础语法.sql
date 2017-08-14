@@ -104,10 +104,41 @@ SELECT 列名 别名, 列名 别名... FROM 表名 [WHERE 条件];
 SELECT * FROM 表名 ORDER BY 列名 ASC;
 SELECT * FROM 表名 ORDER BY 列名 DESC;
 
+--
+SELECT * FROM 表名 WHERE 条件表达式 GROUP BY 分组列名  HAVING 聚合条件表达式 ORDER BY 排序字段 ASC(升序)|DESC(降序)
+
+-- 内连接
+SELECT * FROM 多表1 , 多表2 WHERE 多表1.id = 多表2.id;
+SELECT * FROM 多表1 INNER JOIN 多表2 ON 多表1.id = 多表2.id;
+
+-- 左外连接
+SELECT * FROM 多表1 LEFT OUTER JOIN 多表2 ON 多表1.id = 多表2.id;
+
+-- 右外连接
+SELECT * FROM 多表1 RIGHT OUTER JOIN 多表2 ON 多表1.id = 多表2.id;
+
+-- 全外连接(没有all)
+SELECT * FROM 多表1 LEFT OUTER JOIN 多表2 ON 多表1.id = 多表2.id
+UNION 
+SELECT * FROM 多表1 RIGHT OUTER JOIN 多表2 ON 多表1.id = 多表2.id;
+
+-- 全外连接(有all)
+SELECT * FROM 多表1 LEFT OUTER JOIN 多表2 ON 多表1.id = 多表2.id
+UNION ALL
+SELECT * FROM 多表1 RIGHT OUTER JOIN 多表2 ON 多表1.id = 多表2.id;
 
 
+-- 使用any查询 
+SELECT * FROM 多表1 WHERE 字段1 = ANY (SELECT 字段 FROM 多表2 WHERE 条件表达式);
 
+-- 使用some查询
+SELECT * FROM 多表1 WHERE 字段1 = SOME (SELECT 字段 FROM 多表2 WHERE 条件表达式); 
 
+-- AS表的别名
+SELECT * FROM 多表1,(SELECT * FROM 多表2 WHERE 条件表达式) AS 表的别名 WHERE 多表1.id = 多表2.id;
 
+-- 子查询
+SELECT * FROM 多表1 WHERE 字段 = (WHERE 字段 FROM 多表2 WHERE 条件表达式);
 
-
+-- limit
+SELECT * FROM 表名 LIMIT[offset],row_count;
