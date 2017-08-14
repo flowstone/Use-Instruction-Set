@@ -118,13 +118,13 @@ CREATE TABLE IF NOT EXISTS `category`(
 	cname VARCHAR(100) COMMENT '分类名称'
 )CHARACTER SET utf8 COMMENT '分类表';
 
-/*添加新的字段为分类描述varchar(20)*/
+/*添加新的字段为分类描述VARCHAR(20)*/
 ALTER TABLE category ADD `desc` VARCHAR(20) COMMENT '分类描述';
 
-/*为分类表的描述字段进行修改,类型varchar(50) 添加约束 not NULL */
+/*为分类表的描述字段进行修改,类型VARCHAR(50) 添加约束 NOT NULL */
 ALTER TABLE category MODIFY `desc` VARCHAR(50) NOT NULL COMMENT '分类描述';
 
-/*为分类表的分类名称字段进行更换,更换为description varchar(30)*/
+/*为分类表的分类名称字段进行更换,更换为description VARCHAR(30)*/
 ALTER TABLE category CHANGE `desc`  description VARCHAR(30) NOT NULL COMMENT '分类描述';
 
 /*删除分类表中description这列*/
@@ -207,7 +207,7 @@ SHOW VARIABLES LIKE 'character%';
 /*
 在cmd窗口,使用mysql命令,创建编码utf8的数据库webdb2,创建表users,完成相关查询
 要求: users表的字段  id  name  age   birthday   salary
-1:字段要求: id  int  主键 , age  int  , name 字符类型, birthday 日期类型   salary 数值类型 要求小数点保留2位.
+1:字段要求: id  INT  主键 , age  INT  , name 字符类型, birthday 日期类型   salary 数值类型 要求小数点保留2位.
 
 */
 
@@ -475,8 +475,8 @@ SELECT category_id, COUNT(*) AS 个数 FROM product GROUP BY category_id HAVING 
 
 /*
 1:设计员工表emp和部门表dept
-  要求: emp表的基本字段 empno int 主键 自动自增长,ename 字符类型 salary 数值类型  bonus 奖金数值型……deptno int 员工在的部门 (外键)
-       dept表的基本字段 deptno int 主键 自动增长 , dname 部门名称 字符类型  dlocation 地理位置 字符类型
+  要求: emp表的基本字段 empno INT 主键 自动自增长,ename 字符类型 salary 数值类型  bonus 奖金数值型……deptno INT 员工在的部门 (外键)
+       dept表的基本字段 deptno INT 主键 自动增长 , dname 部门名称 字符类型  dlocation 地理位置 字符类型
 2: 设计表结构 在emp表中设计deptno外键.录入相关数据.
 */
 
@@ -496,6 +496,36 @@ CREATE TABLE tmp_dept (
 	dlocation VARCHAR(20) NOT NULL DEFAULT '' COMMENT '地址位置',
 	PRIMARY KEY (deptno)
 ) CHARACTER SET utf8 COMMENT '部门表';
+
+CREATE TABLE A(
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(20) NOT NULL
+);
+INSERT INTO A VALUES(1,'苹果');
+INSERT INTO A VALUES(2,'橘子');
+INSERT INTO A VALUES(3,'香蕉');
+
+CREATE TABLE B( 
+   id INT PRIMARY KEY AUTO_INCREMENT,
+   price DECIMAL
+);
+INSERT INTO B VALUES(1,2.30);
+INSERT INTO B VALUES(2,3.50);
+INSERT INTO B VALUES(4,NULL);
+
+-- 查询两张表中关于水果的信息，要显示水果名称和水果价格
+SELECT * FROM a,b WHERE a.id = b.id;
+SELECT * FROM a INNER JOIN b ON a.id = b.id; -- 内连接
+SELECT * FROM a LEFT OUTER JOIN b ON a.id = b.id; -- 左外连接
+SELECT * FROM a RIGHT OUTER JOIN b ON a.id = b.id; -- 右外连接
+
+SELECT * FROM a LEFT OUTER JOIN b ON a.id = b.id
+UNION
+SELECT * FROM a RIGHT OUTER JOIN b ON a.id = b.id;
+
+SELECT * FROM a LEFT OUTER JOIN b ON a.id = b.id
+UNION ALL
+SELECT * FROM a RIGHT OUTER JOIN b ON a.id = b.id;
 
 /*
 1:完成学员student 和 老师 teacher 表和课程表的设计
@@ -589,7 +619,240 @@ INSERT INTO student_course VALUES(10,3,80);
 INSERT INTO student_course VALUES(10,4,85);
 INSERT INTO student_course VALUES(10,5,83);
 
---  1、查询平均成绩大于70分的同学的学号和平均成绩
-SELECT student_id, AVG(score) AS 平均分 FROM student_course GROUP BY student_id HAVING 平均分 > 70; 
 
--- 查询所有同学的学号、姓名、选课数、总成绩
+-- 需求 : 查询年龄最大的学生信息
+-- 1.查询年龄最大
+SELECT MAX(age) FROM student;
+-- 2.查询年龄最在的学生信息
+SELECT * FROM student WHERE age IN (SELECT MAX(age) FROM student);
+
+
+-- 需求：查询分数不及格的所有的学生信息
+-- 1.查询不及格学生的student_id号
+SELECT student_id FROM student_course WHERE score < 60;
+-- 2.根据不及格的学生student_id查询学生信息
+SELECT * FROM student WHERE id IN(SELECT student_id FROM student_course WHERE score < 60);
+
+-- 需求：查询分数不及格的所有的学生信息, 需要显示不及格的分数
+-- as 定义 `临时表`
+SELECT * FROM student_course WHERE score < 60;
+
+SELECT student.*, temp.score FROM student,
+	(SELECT * FROM student_course WHERE score < 60) AS temp
+		WHERE student.id = temp.student_id;
+
+-- all 的用法 :
+-- 需求 : 查询年龄最大的学生的信息
+-- 查询所有年龄的学生
+SELECT age FROM student;
+SELECT * FROM student WHERE age >= ALL(SELECT age FROM student);
+
+-- any 和 some 的用法 :
+-- 查询成绩是90的学生 (student) 的信息
+-- 使用 some / any 用法 :
+SELECT student_id FROM student_course WHERE score = 90;
+SELECT * FROM student 
+	WHERE id IN (SELECT student_id FROM student_course WHERE score = 90);
+
+SELECT * FROM student 
+	WHERE id = ANY(SELECT student_id FROM student_course WHERE score = 90);
+
+SELECT * FROM student
+	Where id = SOME(SELECT student_id FROM student_course WHERE score = 90);
+
+-- 需求 : 查询不及格的学生信息和不及格分数
+-- 1. 查询不及格分数
+SELECT * FROM student_course WHERE score < 60;
+-- 2.查询不及格的学生贪睡和不及格分数
+SELECT student.*,temp.score FROM student,
+	(SELECT * FROM student_course WHERE score < 60) AS temp
+		WHERE student.id = temp.student_id;
+
+
+
+
+-- 子查询练习
+-- 需求 : 查询数学成绩比语文成绩高的所有学生信息
+-- 查询数学的id
+SELECT id FROM course WHERE name = '数学';
+-- 根据数学id查询数学成绩
+SELECT * FROM student_course WHERE course_id  = (SELECT id FROM course WHERE name = '数学');
+-- 查询语文id
+SELECT id FROM course WHERE name = '语文';
+-- 根据语文id查询语文的成绩
+SELECT * FROM student_course WHERE course_id = (SELECT id FROM course WHERE name = '语文');
+-- 查询数学成绩比语文成绩高的student_id
+
+SELECT temp1.student_id FROM 
+	(SELECT * FROM student_course WHERE course_id  = (SELECT id FROM course WHERE name = '数学')) AS temp1,
+		(SELECT * FROM student_course WHERE course_id = (SELECT id FROM course WHERE name = '语文')) AS temp2
+			WHERE temp1.student_id = temp2.student_id AND temp1.score > temp2.score;
+
+
+SELECT * FROM student 
+	WHERE id IN (
+		SELECT temp1.student_id FROM 
+			(SELECT * FROM student_course WHERE course_id  = (SELECT id FROM course WHERE name = '数学')) AS temp1,
+				(SELECT * FROM student_course WHERE course_id = (SELECT id FROM course WHERE name = '语文')) AS temp2
+					WHERE temp1.student_id = temp2.student_id AND temp1.score > temp2.score
+	);
+-- mysql 自带函数 (知道即可)
+
+
+
+-- sql 强化练习
+-- limit 限制查询结果返回的数量  (分页)
+
+
+-- 1	查询平均成绩大于70分的同学的学号和平均成绩
+		-- 平均成绩大于70分
+		SELECT student_id, AVG(score) FROM student_course
+			GROUP BY student_id
+				HAVING AVG(score) > 70;
+		
+
+-- 2	查询所有同学的学号、姓名、选课数、总成绩
+		-- 选课数
+		SELECT student_id, COUNT(*), SUM(score) FROM student_course GROUP BY student_id;
+
+		SELECT student.id, temp.选课数, temp.总成绩  FROM student,
+			(SELECT student_id, COUNT(*) AS 选课数, SUM(score) AS 总成绩 FROM student_course GROUP BY student_id) AS temp
+				WHERE student.id = temp.student_id;
+
+-- 3	查询学过赵云老师所教课的同学的学号、姓名
+		SELECT id FROM teacher WHERE name = '赵云';
+		SELECT id FROM course WHERE teacher_id = (SELECT id FROM teacher WHERE name = '赵云');
+		SELECT student_id FROM student_course WHERE course_id IN(
+			SELECT id FROM course WHERE teacher_id = (SELECT id FROM teacher WHERE name = '赵云')
+		);
+
+		SELECT id, name FROM student 
+			WHERE id IN (
+				SELECT student_id FROM student_course WHERE course_id IN(
+					SELECT id FROM course WHERE teacher_id = (SELECT id FROM teacher WHERE name = '赵云')
+				)
+			);
+-- 4	查询没学过关羽老师课的同学的学号、姓名
+		SELECT id FROM teacher WHERE name = '关羽';
+		SELECT id FROM course WHERE teacher_id  = (SELECT id FROM teacher WHERE name = '关羽');
+		SELECT DISTINCT student_id FROM student_course WHERE course_id IN (
+			SELECT id FROM course WHERE teacher_id  = (SELECT id FROM teacher WHERE name = '关羽')
+		);
+		SELECT id, name FROM student
+			WHERE  id NOT IN (
+				SELECT DISTINCT student_id FROM student_course WHERE course_id IN (
+					SELECT id FROM course WHERE teacher_id  = (SELECT id FROM teacher WHERE name = '关羽')
+				)
+			);
+-- 5	查询学三门课以下的同学的学号、姓名
+		SELECT student_id FROM 
+			student_course GROUP BY student_id 
+				HAVING COUNT(*) < 3;
+		
+		SELECT id, name FROM student 
+			WHERE id IN (
+				SELECT student_id FROM 
+					student_course GROUP BY student_id 
+						HAVING COUNT(*) < 3
+			);
+-- 6	查询各科成绩最高和最低的分
+		SELECT course_id, MAX(score) AS 最高分, MIN(score) AS 最低分 FROM student_course GROUP BY course_id;
+-- 7	查询学生信息和平均成绩
+		SELECT student_id, AVG(score) FROM student_course 
+			GROUP BY student_id;
+
+		SELECT student.*, temp.平均分 FROM student,
+			(SELECT student_id, AVG(score) AS 平均分 FROM student_course 
+			GROUP BY student_id) AS temp
+				WHERE student.id = temp.student_id;
+
+-- 8	查询各个城市的学生数量
+		SELECT city, COUNT(*) FROM student GROUP BY city;
+
+-- 9	查询不及格的学生信息和课程信息
+		SELECT * FROM student_course WHERE score < 60;
+
+		SELECT student.*, course.name, temp.score FROM student, course,
+			(SELECT * FROM student_course WHERE score < 60) AS temp
+				WHERE student.id = temp.student_id AND temp.course_id = course.id;
+
+
+-- 10	统计每门课程的学生选修人数（超过四人的进行统计）
+		SELECT course_id,COUNT(*) FROM student_course GROUP BY course_id HAVING COUNT(*) > 4;
+
+-- 强化练习第二部分 : 部门员工查询练习
+CREATE TABLE dept(
+	deptno INT PRIMARY KEY AUTO_INCREMENT COMMENT '部门编号',
+	dname VARCHAR(14) COMMENT '部门名称',
+	loc VARCHAR(13) COMMENT '部门所在位置'
+) CHARACTER SET utf8 COMMENT '部门表';
+
+CREATE TABLE emp(
+	empno INT PRIMARY KEY AUTO_INCREMENT COMMENT '员工工号',
+	ename VARCHAR(10) COMMENT '员工姓名',
+	JOB VARCHAR(9) COMMENT '岗位',
+	MGR INT COMMENT '上司',
+	HIREDATE DATE COMMENT '入职时间',
+	SAL INT COMMENT '薪水',
+	COMM INT COMMENT '拥金',
+	DEPTNO INT NOT NULL,
+	FOREIGN KEY (DEPTNO) REFERENCES dept(deptno)
+) CHARACTER SET utf8 COMMENT '员工表';
+
+INSERT INTO dept VALUES(10,'ACCOUNTING','NEW YORK');
+INSERT INTO dept VALUES(20,'RESEARCH','DALLAS');
+INSERT INTO dept VALUES(30,'SALES','CHICAGO');
+INSERT INTO dept VALUES(40,'OPERATIONS','BOSTON');
+
+INSERT INTO emp VALUES(7369,'SMITH','CLERK',7902,'1980-12-17',800,NULL,20);
+INSERT INTO emp VALUES(7499,'ALLEN','SALESMAN',7698,'1981-02-20',1600,300,30);
+INSERT INTO emp VALUES(7521,'WARD','SALESMAN',7698,'1981-02-22',1250,500,30);
+INSERT INTO emp VALUES(7566,'JONES','MANAGER',7839,'1981-04-02',2975,NULL,20);
+INSERT INTO emp VALUES(7654,'MARTIN','SALESMAN',7698,'1981-09-28',1250,1400,30);
+INSERT INTO emp VALUES(7698,'BLAKE','MANAGER',7839,'1981-05-01',2850,NULL,30);
+INSERT INTO emp VALUES(7782,'CLARK','MANAGER',7839,'1981-06-09',2450,NULL,10);
+INSERT INTO emp VALUES(7788,'SCOTT','ANALYST',7566,'1987-06-13',3000,NULL,20);
+INSERT INTO emp VALUES(7839,'KING','PRESIDENT',NULL,'1981-11-17',5000,NULL,10);
+INSERT INTO emp VALUES(7844,'TURNER','SALESMAN',7698,'1981-09-08',1500,0,30);
+INSERT INTO emp VALUES(7876,'ADAMS','CLERK',7788,'1987-06-13',1100,NULL,20);
+INSERT INTO emp VALUES(7900,'JAMES','CLERK',7698,'1981-12-03',950,NULL,30);
+INSERT INTO emp VALUES(7902,'FORD','ANALYST',7566,'1981-12-03',3000,NULL,20);
+INSERT INTO emp VALUES(7934,'MILLER','CLERK',7782,'1983-01-23',1300,NULL,10);
+
+
+-- 1.	列出至少有4个员工的部门的信息
+	SELECT DEPTNO, COUNT(*) FROM emp GROUP BY DEPTNO HAVING COUNT(*) >= 4;
+	SELECT * FROM dept WHERE deptno IN (SELECT DEPTNO FROM emp GROUP BY DEPTNO HAVING COUNT(*) >= 4);
+-- 2.	列出薪金比“SMITH”多的所有员工
+	SELECT SAL FROM emp WHERE ename = 'SMITH';
+	SELECT * FROM emp WHERE SAL > (SELECT SAL FROM emp WHERE ename = 'SMITH');
+
+-- 3.	列出所有员工的姓名及其直接上级的姓名。
+	SELECT temp1.ename,temp2.ename FROM 
+	(SELECT * FROM emp) AS temp1,
+	(SELECT * FROM emp) AS temp2
+	WHERE temp1.MGR = temp2.empno;
+
+-- 33. 删除10号部门薪水最高的员工
+	SELECT MAX(SAL) FROM emp WHERE DEPTNO = 10 GROUP BY DEPTNO;
+	
+	DELETE FROM emp WHERE SAL IN (SELECT * FROM (SELECT MAX(SAL) FROM emp WHERE DEPTNO = 10 GROUP BY DEPTNO) AS temp );
+
+-- 34. 将薪水最高的员工的薪水降30%
+	SELECT MAX(SAL) FROM emp;
+
+	UPDATE emp SET SAL = SAL * 0.7 
+		WHERE SAL = (SELECT * FROM (SELECT MAX(SAL) FROM emp) AS temp);
+
+-- 35. 查询员工姓名，工资和 工资级别
+SELECT ename, SAL ,CASE WHEN SAL > 3000 THEN '三级'
+					    WHEN SAL > 2000 THEN '二级'
+						ELSE '一级'
+						END AS 工资级别
+						FROM emp;
+
+
+
+
+
+
