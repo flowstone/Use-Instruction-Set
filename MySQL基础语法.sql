@@ -74,13 +74,16 @@ UPDATE 表名 SET 列名=值,列名=值 WHERE 条件;
 /*查看mysql服务的所有客户端和服务端使用的字符集*/
 SHOW VARIABLES LIKE 'character%';
 
-# 临时设置客户端的字符集
+-- 临时设置客户端的字符集
 SET NAMES GBK;
 
-# 开启事务
+-- 开启事务
 START TRANSACTION;
 
-# 回滚事务
+-- 提交事务
+COMMIT;
+
+-- 回滚事务
 ROLLBACK;
 
 -- 查看该表的所有信息

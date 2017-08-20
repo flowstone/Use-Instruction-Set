@@ -81,8 +81,8 @@ ALTER TABLE employee CHARACTER SET utf8;
 /*删除表*/
 DROP TABLE emp;
 
-/**数据记录的CRUD**/
-/**/
+/*数据记录的CRUD*/
+
 INSERT INTO 表名(列名,列名) VALUES(值,值);
 INSERT INTO 表名 VALUES(值,值),(值,值);
 CREATE TABLE user(
@@ -448,29 +448,29 @@ INSERT INTO employee VALUES(NULL,'刘备',22,14000);
 
 /*1.	基于products表的数据,进行聚合函数查询.*/
 /*2.	商品汇总,总价等查询。*/
-#1 查询商品的总条数
+-- 1 查询商品的总条数
 SELECT COUNT(*) AS 总条数 FROM product;
 
-#2 查询价格大于200商品的总条数
+-- 2 查询价格大于200商品的总条数
 SELECT COUNT(*) AS 总条数 FROM product WHERE price > 200;
 
-#3 查询分类为'c001'的所有商品的总和
+-- 3 查询分类为'c001'的所有商品的总和
 SELECT category_id, SUM(price) AS 总和 FROM product 
 	WHERE category_id = 'c001'
 	GROUP BY category_id;
 
-#4 查询分类为'c002'所有商品的平均价格
+-- 4 查询分类为'c002'所有商品的平均价格
 SELECT category_id, AVG(IFNULL(price,0)) AS 平均价格 FROM product 
 	WHERE category_id = 'c002'
 		GROUP BY category_id;
 
-#5 查询商品的最大价格和最小价格
+-- 5 查询商品的最大价格和最小价格
 SELECT MAX(price) AS 最大价格, MIN(price) AS 最小价格 FROM product;
 
-#1 统计各个分类商品的个数
+-- 1 统计各个分类商品的个数
 SELECT category_id, COUNT(*) AS 个数  FROM product GROUP BY category_id; 
 
-#2 统计各个分类商品的个数,且只显示个数大于1的信息
+-- 2 统计各个分类商品的个数,且只显示个数大于1的信息
 SELECT category_id, COUNT(*) AS 个数 FROM product GROUP BY category_id HAVING 个数 > 1;
 
 /*
